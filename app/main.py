@@ -26,3 +26,4 @@ def health_check():
         "service": "CareerBoost API",
         "version": "1.0.0"
     }
+    
