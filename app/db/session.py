@@ -8,3 +8,4 @@ def get_session():
         yield session
     finally:
         session.close()
+        
