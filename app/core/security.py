@@ -68,4 +68,3 @@ def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
             detail="Token missing user ID",
         )
     return int(user_id)
-    
