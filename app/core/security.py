@@ -4,12 +4,12 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+http_bearer = HTTPBearer()
 
 
 def hash_password(password: str) -> str:
@@ -52,8 +52,11 @@ def decode_access_token(token: str) -> Optional[dict]:
         return None
 
 
-def get_current_user_id(token: str = Depends(oauth2_scheme)) -> int:
-    """FastAPI dependency — extracts user ID from JWT token."""
+def get_current_user_id(
+    credentials: HTTPAuthorizationCredentials = Depends(http_bearer)
+) -> int:
+    """FastAPI dependency — extracts user ID from Bearer token."""
+    token = credentials.credentials
     payload = decode_access_token(token)
     if payload is None:
         raise HTTPException(
