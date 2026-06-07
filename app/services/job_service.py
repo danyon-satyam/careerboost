@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from sqlalchemy import or_, and_
+from sqlalchemy import or_
 from typing import Optional, List
 
 from app.models.job import Job
@@ -21,7 +21,7 @@ class JobService:
         """Fetch job by ID. Raises NotFoundError if not found."""
         job = db.query(Job).filter(
             Job.id == job_id,
-            Job.is_active == True
+            Job.is_active.is_(True)
         ).first()
         if not job:
             raise NotFoundError("Job not found")
@@ -41,7 +41,7 @@ class JobService:
         Get paginated job listings with optional filters.
         Returns jobs + total count + pagination info.
         """
-        query = db.query(Job).filter(Job.is_active == True)
+        query = db.query(Job).filter(Job.is_active.is_(True))
 
         if location:
             query = query.filter(
@@ -81,7 +81,7 @@ class JobService:
         search_term = f"%{query_str.strip()}%"
 
         query = db.query(Job).filter(
-            Job.is_active == True,
+            Job.is_active.is_(True),
             or_(
                 Job.title.ilike(search_term),
                 Job.company.ilike(search_term),
@@ -116,7 +116,7 @@ class JobService:
 
         similar = db.query(Job).filter(
             Job.id != job_id,
-            Job.is_active == True,
+            Job.is_active.is_(True),
             or_(
                 Job.location == job.location,
                 Job.job_type == job.job_type,
