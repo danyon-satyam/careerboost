@@ -141,3 +141,33 @@ class TestUserProfile:
             json={"full_name": "Hacker"}
         )
         assert response.status_code == 403
+
+
+class TestUserStatsAndDelete:
+    def test_get_user_stats(self, client, registered_user, auth_headers):
+        response = client.get(
+            "/api/v1/users/stats",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "user_id" in data
+        assert "total_interviews" in data
+        assert "total_typing_sessions" in data
+        assert "total_applications" in data
+        assert "skills_count" in data
+        assert data["total_interviews"] == 0
+        assert data["total_typing_sessions"] == 0
+
+    def test_delete_account(self, client, registered_user, auth_headers):
+        response = client.delete(
+            "/api/v1/users/account",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["message"] == "Account deactivated successfully"
+
+    def test_delete_account_unauthenticated(self, client):
+        response = client.delete("/api/v1/users/account")
+        assert response.status_code == 403
