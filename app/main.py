@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.v1.endpoints import auth, users, jobs
+
 app = FastAPI(
     title="CareerBoost API",
     description="AI-powered interview prep, typing practice & job portal",
@@ -17,8 +19,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register routers
+app.include_router(auth.router, prefix="/api/v1")
+app.include_router(users.router, prefix="/api/v1")
+app.include_router(jobs.router, prefix="/api/v1")
 
-@app.get("/health", tags=["health"])
+
+@app.get("/health", tags=["Health"])
 def health_check():
     """Health check — returns 200 if API is running."""
     return {
