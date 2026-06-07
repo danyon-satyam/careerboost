@@ -220,3 +220,81 @@ class TestJobSearch:
     def test_search_jobs_missing_query(self, client):
         response = client.get("/api/v1/jobs/search")
         assert response.status_code == 422
+
+
+class TestJobDeactivate:
+    def test_deactivate_job_success(self, client, auth_headers):
+        # Create job first
+        create_response = client.post(
+            "/api/v1/jobs",
+            json={
+                "title": "Job To Delete",
+                "company": "DeleteCo",
+                "description": "This job will be deactivated",
+                "location": "Delhi",
+                "required_skills": ["Python"],
+                "required_experience": 1,
+                "job_type": "full-time"
+            },
+            headers=auth_headers
+        )
+        assert create_response.status_code == 201
+        job_id = create_response.json()["id"]
+
+        # Deactivate it
+        response = client.delete(
+            f"/api/v1/jobs/{job_id}",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        assert "deactivated" in response.json()["message"]
+
+    def test_deactivate_job_requires_auth(self, client, auth_headers):
+        # Create job first
+        create_response = client.post(
+            "/api/v1/jobs",
+            json={
+                "title": "Another Job",
+                "company": "SomeCo",
+                "description": "Job for auth test",
+                "location": "Kolkata",
+                "required_skills": ["Java"],
+                "required_experience": 2,
+                "job_type": "full-time"
+            },
+            headers=auth_headers
+        )
+        job_id = create_response.json()["id"]
+
+        # Try without token
+        response = client.delete(f"/api/v1/jobs/{job_id}")
+        assert response.status_code == 403
+
+    def test_deactivated_job_not_in_listing(
+        self, client, auth_headers
+    ):
+        # Create job
+        create_response = client.post(
+            "/api/v1/jobs",
+            json={
+                "title": "Invisible Job",
+                "company": "GhostCo",
+                "description": "Will disappear from listing",
+                "location": "Goa",
+                "required_skills": ["Go"],
+                "required_experience": 3,
+                "job_type": "contract"
+            },
+            headers=auth_headers
+        )
+        job_id = create_response.json()["id"]
+
+        # Deactivate
+        client.delete(
+            f"/api/v1/jobs/{job_id}",
+            headers=auth_headers
+        )
+
+        # Should not appear in listing
+        response = client.get(f"/api/v1/jobs/{job_id}")
+        assert response.status_code == 404
