@@ -10,9 +10,10 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     GEMINI_API_KEY: Optional[str] = None
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": True
+    }
 
 
 settings = Settings()
