@@ -113,7 +113,7 @@ class WebSearchService:
     def is_available(self) -> bool:
         """Check if web search is available."""
         try:
-            results = self.search("test", max_results=1)
+            self.search("test", max_results=1)
             return True
         except Exception:
             return False
