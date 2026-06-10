@@ -13,7 +13,6 @@ from typing import Optional
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.interview import Interview, Question, Answer
-from app.models.job import Job
 from app.services.gemini_service import gemini_service
 from app.services.answer_evaluator import answer_evaluator
 from app.services.question_generator import question_generator
