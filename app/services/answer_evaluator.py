@@ -212,9 +212,9 @@ class AnswerEvaluator:
         """
         skill_score = int(skill_coverage * 100)
         blended = (
-            (ai_score * 0.70) +
-            (nlp_score * 0.20) +
-            (skill_score * 0.10)
+            (ai_score * 0.70)
+            + (nlp_score * 0.20)
+            + (skill_score * 0.10)
         )
         return min(100, max(0, int(blended)))
 
