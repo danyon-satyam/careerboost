@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from datetime import datetime, timezone
+from app.services.answer_evaluator import answer_evaluator
+from app.services.question_generator import question_generator
 
 from app.models.interview import Interview, Question, Answer
 from app.models.job import Job
@@ -94,9 +96,26 @@ class InterviewService:
         db.add(interview)
         db.flush()  # Get interview.id without committing
 
-        # Generate questions
-        # Week 2: replace with Gemini AI question generation
-        for q_data in DEFAULT_QUESTIONS:
+        # Generate AI questions based on job + candidate profile
+        user = db.query(
+            __import__(
+                'app.models.user', fromlist=['User']
+            ).User
+        ).filter_by(id=user_id).first()
+
+        candidate_skills = user.skills if user else []
+        candidate_experience = user.experience_years if user else 0.0
+
+        questions_data = question_generator.generate_questions(
+            job_title=job.title,
+            job_description=job.description,
+            required_skills=job.required_skills or [],
+            candidate_experience=candidate_experience,
+            candidate_skills=candidate_skills,
+            num_questions=5
+        )
+
+        for q_data in questions_data:
             question = Question(
                 interview_id=interview.id,
                 **q_data
@@ -118,9 +137,10 @@ class InterviewService:
         If user_id provided, verifies ownership.
         Raises NotFoundError if not found.
         """
-        query = db.query(Interview).filter(
-            Interview.id == interview_id
-        )
+        from sqlalchemy.orm import joinedload
+        query = db.query(Interview).options(
+            joinedload(Interview.job)
+        ).filter(Interview.id == interview_id)
         if user_id:
             query = query.filter(Interview.user_id == user_id)
 
@@ -169,17 +189,21 @@ class InterviewService:
         if not question:
             raise NotFoundError("Question not found in this interview")
 
-        # Basic scoring placeholder
-        # Week 2: replace with Gemini + spaCy evaluation
-        score, feedback = self._basic_evaluate(answer_text)
+        # AI evaluation pipeline: spaCy → DuckDuckGo → Gemini
+        evaluation = answer_evaluator.evaluate(
+            question_text=question.question_text,
+            answer_text=answer_text,
+            job_title=interview.job.title,
+            required_skills=interview.job.required_skills or [],
+        )
 
         answer = Answer(
             question_id=question_id,
             user_id=user_id,
             answer_text=answer_text,
             duration_seconds=duration_seconds,
-            score=score,
-            feedback=feedback
+            score=evaluation["score"],
+            feedback=evaluation["feedback"]
         )
         db.add(answer)
         db.commit()
