@@ -6,12 +6,10 @@ Uses sentence-transformers for semantic similarity when available,
 falls back to keyword matching. Zero external API calls.
 """
 import logging
-from typing import Optional
 from sqlalchemy.orm import Session
 
 from app.models.job import Job
 from app.models.user import User
-from app.services.nlp_service import nlp_service
 
 logger = logging.getLogger(__name__)
 
@@ -76,9 +74,9 @@ class JobMatcherService:
 
         # Weighted final score
         final_score = int(
-            (skill_score * 0.40) +
-            (exp_score * 0.30) +
-            (semantic_score * 0.30)
+            (skill_score * 0.40)
+            + (exp_score * 0.30)
+            + (semantic_score * 0.30)
         )
         final_score = min(100, max(0, final_score))
 

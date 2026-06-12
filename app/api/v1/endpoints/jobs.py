@@ -164,7 +164,7 @@ def get_job_match_score(
     job = job_service.get_by_id(db, job_id)
     user = _user_service.get_by_id(db, current_user_id)
     return job_matcher_service.calculate_match_score(user, job)
-    
+
 
 @router.post(
     "",

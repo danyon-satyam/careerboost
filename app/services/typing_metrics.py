@@ -4,7 +4,6 @@ for the typing practice platform inspired by Monkeytype.
 
 Zero API calls — pure math, completely free.
 """
-import re
 from typing import Optional
 
 

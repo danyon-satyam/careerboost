@@ -1,11 +1,10 @@
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List
 
 from app.db.database import get_db
 from app.core.security import get_current_user_id
 from app.schemas.typing import (
-    TypingTestRequest,
     TypingSubmit,
     TypingResult,
     TypingResultDetail
