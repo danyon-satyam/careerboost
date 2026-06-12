@@ -472,3 +472,78 @@ class TestConversationFlow:
         data = response.json()
         assert data["interview_complete"] is True
         assert "message" in data
+
+
+class TestInterviewServiceEdgeCases:
+    def test_submit_answer_to_completed_interview(
+        self, client, auth_headers, sample_job
+    ):
+        """Cannot submit answer after interview ends."""
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        # End the interview
+        client.post(
+            f"/api/v1/interviews/{interview_id}/end",
+            headers=auth_headers
+        )
+
+        # Try to submit answer to completed interview
+        question_id = start.json()["questions"][0]["id"]
+        response = client.post(
+            f"/api/v1/interviews/{interview_id}/submit-answer",
+            json={
+                "question_id": question_id,
+                "answer_text": "Some answer here for testing purposes",
+                "duration_seconds": 30
+            },
+            headers=auth_headers
+        )
+        assert response.status_code == 400
+
+    def test_end_already_completed_interview(
+        self, client, auth_headers, sample_job
+    ):
+        """Cannot end an already completed interview."""
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        # End once
+        client.post(
+            f"/api/v1/interviews/{interview_id}/end",
+            headers=auth_headers
+        )
+
+        # End again — should fail
+        response = client.post(
+            f"/api/v1/interviews/{interview_id}/end",
+            headers=auth_headers
+        )
+        assert response.status_code == 400
+
+    def test_results_before_completion(
+        self, client, auth_headers, sample_job
+    ):
+        """Can get results even for in-progress interview."""
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        response = client.get(
+            f"/api/v1/interviews/{interview_id}/results",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "in-progress"

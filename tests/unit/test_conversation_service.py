@@ -150,3 +150,126 @@ class TestConversationIntegration:
                 question_id=1,
                 answer_text="Some answer"
             )
+
+
+class TestConversationHelpers:
+    """Tests for all internal helper methods."""
+
+    def setup_method(self):
+        self.service = ConversationService()
+
+    def test_needs_follow_up_exactly_20_words(self):
+        """Boundary: exactly 20 words should NOT trigger follow-up."""
+        answer = " ".join(["word"] * 20)
+        evaluation = {"score": 75}
+        result = self.service._needs_follow_up(evaluation, answer)
+        assert result is False
+
+    def test_needs_follow_up_19_words(self):
+        """Below 20 words always triggers follow-up."""
+        answer = " ".join(["word"] * 19)
+        evaluation = {"score": 75}
+        result = self.service._needs_follow_up(evaluation, answer)
+        assert result is True
+
+    def test_needs_follow_up_score_exactly_40(self):
+        """Score of 40 does not trigger follow-up."""
+        answer = " ".join(["word"] * 30)
+        evaluation = {"score": 40}
+        result = self.service._needs_follow_up(evaluation, answer)
+        assert result is False
+
+    def test_needs_follow_up_score_39(self):
+        """Score below 40 triggers follow-up."""
+        answer = " ".join(["word"] * 30)
+        evaluation = {"score": 39}
+        result = self.service._needs_follow_up(evaluation, answer)
+        assert result is True
+
+    def test_get_transition_technical_category(self):
+        msg = self.service._get_transition_message(
+            question_order=3,
+            total_questions=5,
+            answered_count=2,
+            job_title="Developer",
+            question_category="technical"
+        )
+        assert "technical" in msg.lower()
+
+    def test_get_transition_behavioral_category(self):
+        msg = self.service._get_transition_message(
+            question_order=2,
+            total_questions=5,
+            answered_count=1,
+            job_title="Developer",
+            question_category="behavioral"
+        )
+        assert isinstance(msg, str)
+        assert len(msg) > 0
+
+    def test_get_transition_general_category(self):
+        msg = self.service._get_transition_message(
+            question_order=2,
+            total_questions=5,
+            answered_count=1,
+            job_title="Developer",
+            question_category="general"
+        )
+        assert isinstance(msg, str)
+
+    def test_build_response_medium_score(self):
+        msg = self.service._build_response_message(
+            evaluation={"score": 65},
+            has_follow_up=False
+        )
+        assert "thank you" in msg.lower()
+
+    def test_build_response_low_score(self):
+        msg = self.service._build_response_message(
+            evaluation={"score": 40},
+            has_follow_up=False
+        )
+        assert isinstance(msg, str)
+        assert len(msg) > 0
+
+    def test_generate_section_intro_general(self):
+        intro = self.service.generate_section_intro(
+            "general", "Developer"
+        )
+        assert isinstance(intro, str)
+        assert len(intro) > 0
+
+    def test_generate_section_intro_unknown(self):
+        intro = self.service.generate_section_intro(
+            "unknown_section", "Developer"
+        )
+        assert isinstance(intro, str)
+
+    def test_get_greeting_fallback_uses_first_name(self):
+        with patch(
+            "app.services.conversation_service.gemini_service"
+        ) as mock_gemini:
+            mock_gemini.is_available.return_value = False
+            greeting = self.service.get_interview_greeting(
+                job_title="Python Developer",
+                candidate_name="Danyon Satyam",
+                total_questions=5
+            )
+        assert "Danyon" in greeting
+        assert "5" in greeting
+
+    def test_get_greeting_ai_fallback_on_error(self):
+        with patch(
+            "app.services.conversation_service.gemini_service"
+        ) as mock_gemini:
+            mock_gemini.is_available.return_value = True
+            mock_gemini.generate_text.side_effect = Exception(
+                "API error"
+            )
+            greeting = self.service.get_interview_greeting(
+                job_title="Python Developer",
+                candidate_name="Satyam",
+                total_questions=3
+            )
+        assert "Satyam" in greeting
+        assert isinstance(greeting, str)
