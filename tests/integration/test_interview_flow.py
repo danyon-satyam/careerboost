@@ -278,3 +278,197 @@ class TestInterviewResults:
             f"/api/v1/interviews/{interview_id}/results"
         )
         assert response.status_code == 403
+
+
+class TestConversationFlow:
+    def test_get_next_question_success(
+        self, client, auth_headers, sample_job
+    ):
+        # Start interview first
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        response = client.get(
+            f"/api/v1/interviews/{interview_id}/next-question",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["interview_complete"] is False
+        assert "question" in data
+        assert "transition_message" in data
+        assert "progress" in data
+        assert data["progress"]["current"] == 1
+        assert data["progress"]["total"] == 5
+
+    def test_get_next_question_requires_auth(
+        self, client, auth_headers, sample_job
+    ):
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        response = client.get(
+            f"/api/v1/interviews/{interview_id}/next-question"
+        )
+        assert response.status_code == 403
+
+    def test_get_next_question_not_found(
+        self, client, auth_headers
+    ):
+        response = client.get(
+            "/api/v1/interviews/99999/next-question",
+            headers=auth_headers
+        )
+        assert response.status_code == 404
+
+    def test_process_answer_success(
+        self, client, auth_headers, sample_job
+    ):
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+        question_id = start.json()["questions"][0]["id"]
+
+        response = client.post(
+            f"/api/v1/interviews/{interview_id}/process-answer",
+            json={
+                "question_id": question_id,
+                "answer_text": (
+                    "I have been working with Python for 2 years "
+                    "building REST APIs with FastAPI and SQLAlchemy. "
+                    "I have also worked with React on the frontend "
+                    "and deployed applications to GCP Cloud Run."
+                ),
+                "duration_seconds": 55
+            },
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "score" in data
+        assert "feedback" in data
+        assert "response_message" in data
+        assert "needs_follow_up" in data
+        assert 0 <= data["score"] <= 100
+
+    def test_process_answer_short_triggers_follow_up(
+        self, client, auth_headers, sample_job
+    ):
+        """
+        Short answers (under 20 words) should always trigger
+        needs_follow_up=True regardless of Gemini availability.
+        """
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+        question_id = start.json()["questions"][0]["id"]
+
+        response = client.post(
+            f"/api/v1/interviews/{interview_id}/process-answer",
+            json={
+                "question_id": question_id,
+                "answer_text": "I know Python.",
+                "duration_seconds": 5
+            },
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        # needs_follow_up is True because answer < 20 words
+        # follow_up_question may be None if Gemini is rate-limited
+        assert data["needs_follow_up"] is True
+        assert data["score"] <= 40
+
+    def test_process_answer_requires_auth(
+        self, client, auth_headers, sample_job
+    ):
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+        question_id = start.json()["questions"][0]["id"]
+
+        response = client.post(
+            f"/api/v1/interviews/{interview_id}/process-answer",
+            json={
+                "question_id": question_id,
+                "answer_text": "Some answer",
+                "duration_seconds": 30
+            }
+        )
+        assert response.status_code == 403
+
+    def test_get_greeting_success(
+        self, client, auth_headers, sample_job
+    ):
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+
+        response = client.get(
+            f"/api/v1/interviews/{interview_id}/greeting",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert "greeting" in data
+        assert "interview_id" in data
+        assert "total_questions" in data
+        assert data["total_questions"] == 5
+
+    def test_next_question_shows_complete_after_all_answered(
+        self, client, auth_headers, sample_job
+    ):
+        # Start interview
+        start = client.post(
+            "/api/v1/interviews/start",
+            json={"job_id": sample_job["id"]},
+            headers=auth_headers
+        )
+        interview_id = start.json()["id"]
+        questions = start.json()["questions"]
+
+        # Answer all 5 questions
+        for q in questions:
+            client.post(
+                f"/api/v1/interviews/{interview_id}/submit-answer",
+                json={
+                    "question_id": q["id"],
+                    "answer_text": (
+                        "I have experience with Python and FastAPI "
+                        "building production REST APIs with proper "
+                        "testing and documentation."
+                    ),
+                    "duration_seconds": 45
+                },
+                headers=auth_headers
+            )
+
+        # Now next-question should return interview_complete=True
+        response = client.get(
+            f"/api/v1/interviews/{interview_id}/next-question",
+            headers=auth_headers
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["interview_complete"] is True
+        assert "message" in data

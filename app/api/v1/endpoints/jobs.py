@@ -6,6 +6,8 @@ from app.db.database import get_db
 from app.core.security import get_current_user_id
 from app.schemas.job import JobCreate, JobResponse, JobListResponse, JobSearchResponse
 from app.services.job_service import job_service
+from app.services.job_matcher import job_matcher_service
+from app.services.user_service import user_service as _user_service
 
 router = APIRouter(prefix="/jobs", tags=["Jobs"])
 
@@ -70,6 +72,54 @@ def search_jobs(
 
 
 @router.get(
+    "/recommendations",
+    summary="Get personalized job recommendations"
+)
+def get_recommendations(
+    limit: int = Query(default=10, ge=1, le=50),
+    min_score: int = Query(default=30, ge=0, le=100),
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get AI-powered job recommendations based on your profile.
+
+    Scoring uses:
+    - Skill match (40%): how many required skills you have
+    - Experience match (30%): your years vs required
+    - Semantic similarity (30%): NLP profile matching
+
+    Update your profile skills to improve recommendations.
+    """
+    user = _user_service.get_by_id(db, current_user_id)
+    recommendations = job_matcher_service.get_recommendations(
+        db=db,
+        user=user,
+        limit=limit,
+        min_score=min_score
+    )
+
+    return {
+        "recommendations": [
+            {
+                "job_id": r["job"].id,
+                "title": r["job"].title,
+                "company": r["job"].company,
+                "location": r["job"].location,
+                "job_type": r["job"].job_type,
+                "match_score": r["match_score"],
+                "matched_skills": r["matched_skills"],
+                "missing_skills": r["missing_skills"],
+                "recommendation": r["recommendation"]
+            }
+            for r in recommendations
+        ],
+        "total": len(recommendations),
+        "user_skills_count": len(user.skills or [])
+    }
+
+
+@router.get(
     "/{job_id}",
     response_model=JobResponse,
     summary="Get job details by ID"
@@ -97,6 +147,24 @@ def get_similar_jobs(
     """
     return job_service.get_similar(db, job_id)
 
+
+@router.get(
+    "/{job_id}/match-score",
+    summary="Get match score for a specific job"
+)
+def get_job_match_score(
+    job_id: int,
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Get your personal match score for a specific job.
+    Returns detailed breakdown of skill and experience match.
+    """
+    job = job_service.get_by_id(db, job_id)
+    user = _user_service.get_by_id(db, current_user_id)
+    return job_matcher_service.calculate_match_score(user, job)
+    
 
 @router.post(
     "",

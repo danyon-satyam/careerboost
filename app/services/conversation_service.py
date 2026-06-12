@@ -227,7 +227,7 @@ class ConversationService:
             ),
             "response_message": response_message,
             "follow_up_question": follow_up,
-            "needs_follow_up": follow_up is not None
+            "needs_follow_up": needs_follow_up
         }
 
     def get_interview_greeting(
