@@ -27,6 +27,7 @@ app.include_router(interviews.router, prefix="/api/v1")
 app.include_router(typing.router, prefix="/api/v1")
 app.include_router(analytics.router, prefix="/api/v1")
 
+
 @app.get("/health", tags=["Health"])
 def health_check():
     """Health check — returns 200 if API is running."""

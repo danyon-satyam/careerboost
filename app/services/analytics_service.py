@@ -6,11 +6,9 @@ Zero external API calls — pure DB aggregation.
 """
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from typing import Optional
 
 from app.models.interview import Interview, Answer, Question
 from app.models.typing_session import TypingSession, JobApplication
-from app.models.user import User
 
 
 class AnalyticsService:
