@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { motion } from "framer-motion";
 import { setCredentials } from "../store/slices/authSlice.js";
 import authService from "../services/authService.js";
 import AuthSidePanel from "../components/auth/AuthSidePanel.jsx";
+import { fadeInUp } from "../animations/variants.js";
+import { transitionDefault } from "../animations/transitions.js";
 
 function LoginPage() {
   const navigate = useNavigate();
@@ -123,7 +126,13 @@ function LoginPage() {
           boxSizing: "border-box",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 440 }}>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          transition={transitionDefault}
+          style={{ width: "100%", maxWidth: 440 }}
+        >
           <div style={{ textAlign: "center", marginBottom: "2.5rem" }}>
             <Link
               to="/"
@@ -398,7 +407,7 @@ function LoginPage() {
               Create a free account
             </Link>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <style>{`
