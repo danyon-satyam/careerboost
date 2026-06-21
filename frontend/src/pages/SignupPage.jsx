@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { motion } from "framer-motion";
 import { setCredentials } from "../store/slices/authSlice.js";
 import authService from "../services/authService.js";
 import AuthSidePanel from "../components/auth/AuthSidePanel.jsx";
+import { fadeInUp } from "../animations/variants.js";
+import { transitionDefault } from "../animations/transitions.js";
 
 function inputStyleFor(hasError) {
   return {
@@ -190,7 +193,6 @@ function SignupPage() {
         width: "100%",
       }}
     >
-      {/* Left — animated side panel, takes remaining space, hidden on small screens */}
       <div
         className="auth-side-panel"
         style={{
@@ -201,7 +203,6 @@ function SignupPage() {
         <AuthSidePanel />
       </div>
 
-      {/* Right — form card, fixed width, hugs the right edge */}
       <div
         className="auth-form-side"
         style={{
@@ -214,7 +215,13 @@ function SignupPage() {
           boxSizing: "border-box",
         }}
       >
-        <div style={{ width: "100%", maxWidth: 440 }}>
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          transition={transitionDefault}
+          style={{ width: "100%", maxWidth: 440 }}
+        >
           <div style={{ textAlign: "center", marginBottom: "2rem" }}>
             <Link
               to="/"
@@ -436,7 +443,7 @@ function SignupPage() {
               Privacy Policy.
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       <style>{`

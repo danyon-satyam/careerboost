@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { fadeInUp, staggerContainer, staggerItem } from '../animations/variants.js';
+import { transitionDefault, transitionSlow } from '../animations/transitions.js';
 import CrossGridBackground from '../components/layout/CrossGridBackground.jsx';
 
-// ── Design constants ─────────────────────────────────────
 const SECTION_MAX_WIDTH = 1200;
 const SECTION_PADDING = '5rem 2rem';
 
-// ── Reusable components ──────────────────────────────────
-
 function FeatureCard({ icon, title, description }) {
   return (
-    <div
+    <motion.div
+      variants={staggerItem}
+      transition={transitionDefault}
       style={{
         flex: '1 1 320px',
         maxWidth: 380,
@@ -28,8 +30,7 @@ function FeatureCard({ icon, title, description }) {
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = 'rgba(45, 212, 191, 0.3)';
         e.currentTarget.style.transform = 'translateY(-3px)';
-        e.currentTarget.style.boxShadow =
-          '0 8px 32px rgba(45, 212, 191, 0.1)';
+        e.currentTarget.style.boxShadow = '0 8px 32px rgba(45, 212, 191, 0.1)';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.08)';
@@ -54,27 +55,14 @@ function FeatureCard({ icon, title, description }) {
         {icon}
       </div>
       <div>
-        <h3
-          style={{
-            color: '#F9FAFB',
-            fontWeight: 600,
-            fontSize: '1.05rem',
-            marginBottom: '0.5rem',
-          }}
-        >
+        <h3 style={{ color: '#F9FAFB', fontWeight: 600, fontSize: '1.05rem', marginBottom: '0.5rem' }}>
           {title}
         </h3>
-        <p
-          style={{
-            color: '#6B7280',
-            fontSize: '0.875rem',
-            lineHeight: 1.7,
-          }}
-        >
+        <p style={{ color: '#6B7280', fontSize: '0.875rem', lineHeight: 1.7 }}>
           {description}
         </p>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -95,16 +83,16 @@ function StatItem({ value, label }) {
       >
         {value}
       </div>
-      <div style={{ color: '#6B7280', fontSize: '0.8rem', fontWeight: 500 }}>
-        {label}
-      </div>
+      <div style={{ color: '#6B7280', fontSize: '0.8rem', fontWeight: 500 }}>{label}</div>
     </div>
   );
 }
 
 function StepCard({ number, title, description }) {
   return (
-    <div
+    <motion.div
+      variants={staggerItem}
+      transition={transitionDefault}
       style={{
         flex: '1 1 180px',
         padding: '1.5rem',
@@ -129,20 +117,11 @@ function StepCard({ number, title, description }) {
       >
         {number}
       </div>
-      <h3
-        style={{
-          fontWeight: 600,
-          fontSize: '0.95rem',
-          color: '#F9FAFB',
-          marginBottom: '0.5rem',
-        }}
-      >
+      <h3 style={{ fontWeight: 600, fontSize: '0.95rem', color: '#F9FAFB', marginBottom: '0.5rem' }}>
         {title}
       </h3>
-      <p style={{ color: '#6B7280', fontSize: '0.825rem', lineHeight: 1.6 }}>
-        {description}
-      </p>
-    </div>
+      <p style={{ color: '#6B7280', fontSize: '0.825rem', lineHeight: 1.6 }}>{description}</p>
+    </motion.div>
   );
 }
 
@@ -184,8 +163,6 @@ function scrollTo(id) {
   if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-// ── Main component ───────────────────────────────────────
-
 function LandingPage() {
   return (
     <div
@@ -196,7 +173,6 @@ function LandingPage() {
         overflowX: 'hidden',
       }}
     >
-
       {/* ── Navbar ───────────────────────────────────── */}
       <nav
         style={{
@@ -216,7 +192,6 @@ function LandingPage() {
           borderBottom: '1px solid rgba(255,255,255,0.05)',
         }}
       >
-        {/* Logo */}
         <button
           onClick={() => scrollTo('hero')}
           style={{
@@ -245,9 +220,7 @@ function LandingPage() {
           >
             CB
           </div>
-          <span
-            style={{ fontWeight: 700, fontSize: '1.05rem', color: '#F9FAFB' }}
-          >
+          <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#F9FAFB' }}>
             Career
             <span
               style={{
@@ -262,7 +235,6 @@ function LandingPage() {
           </span>
         </button>
 
-        {/* Nav links */}
         <div style={{ display: 'flex', gap: '2.5rem', alignItems: 'center' }}>
           {[
             { label: 'Features', id: 'features' },
@@ -283,16 +255,13 @@ function LandingPage() {
                 transition: 'color 200ms ease',
               }}
               onMouseEnter={(e) => (e.currentTarget.style.color = '#F9FAFB')}
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.color = '#9CA3AF')
-              }
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
             >
               {label}
             </button>
           ))}
         </div>
 
-        {/* Auth */}
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
           <Link
             to="/login"
@@ -304,12 +273,8 @@ function LandingPage() {
               borderRadius: '0.5rem',
               transition: 'color 200ms ease',
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.color = '#F9FAFB')
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.color = '#9CA3AF')
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.color = '#F9FAFB')}
+            onMouseLeave={(e) => (e.currentTarget.style.color = '#9CA3AF')}
           >
             Log in
           </Link>
@@ -326,9 +291,7 @@ function LandingPage() {
               whiteSpace: 'nowrap',
               transition: 'opacity 200ms ease',
             }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.opacity = '0.85')
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
             onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
           >
             Get started free
@@ -347,13 +310,11 @@ function LandingPage() {
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          // 60px = navbar height, 40px breathing room top, 60px bottom
           padding: '100px 2rem 60px',
         }}
       >
         <CrossGridBackground opacity={0.1} />
 
-        {/* Glow blobs */}
         <div
           style={{
             position: 'absolute',
@@ -362,8 +323,7 @@ function LandingPage() {
             width: 420,
             height: 420,
             borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(45,212,191,0.1) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(45,212,191,0.1) 0%, transparent 70%)',
             pointerEvents: 'none',
           }}
         />
@@ -375,16 +335,18 @@ function LandingPage() {
             width: 320,
             height: 320,
             borderRadius: '50%',
-            background:
-              'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)',
+            background: 'radial-gradient(circle, rgba(6,182,212,0.08) 0%, transparent 70%)',
             pointerEvents: 'none',
           }}
         />
 
-        <div
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={fadeInUp}
+          transition={transitionSlow}
           style={{ position: 'relative', zIndex: 10, maxWidth: 760 }}
         >
-          {/* Badge */}
           <div
             style={{
               display: 'inline-flex',
@@ -413,7 +375,6 @@ function LandingPage() {
             Powered by Gemini AI · 100% Free
           </div>
 
-          {/* Headline */}
           <h1
             style={{
               fontSize: 'clamp(2.25rem, 5.5vw, 4rem)',
@@ -440,7 +401,6 @@ function LandingPage() {
             prep
           </h1>
 
-          {/* Sub */}
           <p
             style={{
               fontSize: 'clamp(0.95rem, 1.8vw, 1.125rem)',
@@ -455,7 +415,6 @@ function LandingPage() {
             candidates.
           </p>
 
-          {/* CTAs */}
           <div
             style={{
               display: 'flex',
@@ -480,13 +439,11 @@ function LandingPage() {
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = 'translateY(-2px)';
-                e.currentTarget.style.boxShadow =
-                  '0 0 36px rgba(45,212,191,0.52)';
+                e.currentTarget.style.boxShadow = '0 0 36px rgba(45,212,191,0.52)';
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow =
-                  '0 0 24px rgba(45,212,191,0.32)';
+                e.currentTarget.style.boxShadow = '0 0 24px rgba(45,212,191,0.32)';
               }}
             >
               Start practicing free →
@@ -505,13 +462,11 @@ function LandingPage() {
                 transition: 'all 200ms ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor =
-                  'rgba(45,212,191,0.35)';
+                e.currentTarget.style.borderColor = 'rgba(45,212,191,0.35)';
                 e.currentTarget.style.color = '#2DD4BF';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor =
-                  'rgba(255,255,255,0.1)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)';
                 e.currentTarget.style.color = '#F9FAFB';
               }}
             >
@@ -519,7 +474,6 @@ function LandingPage() {
             </Link>
           </div>
 
-          {/* Stats */}
           <div
             style={{
               display: 'grid',
@@ -537,56 +491,31 @@ function LandingPage() {
             }}
           >
             <StatItem value="10K+" label="Interviews completed" />
-            <div
-              style={{
-                width: 1,
-                height: 36,
-                background: 'rgba(255,255,255,0.1)',
-              }}
-            />
+            <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.1)' }} />
             <StatItem value="93%" label="Avg test coverage" />
-            <div
-              style={{
-                width: 1,
-                height: 36,
-                background: 'rgba(255,255,255,0.1)',
-              }}
-            />
+            <div style={{ width: 1, height: 36, background: 'rgba(255,255,255,0.1)' }} />
             <StatItem value="$0" label="Forever free" />
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Features ─────────────────────────────────── */}
-      <section
-        id="features"
-        style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}
-      >
+      <section id="features" style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}>
         <div style={{ maxWidth: SECTION_MAX_WIDTH, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <SectionLabel>Everything you need</SectionLabel>
             <SectionHeading>Three platforms, one goal</SectionHeading>
-            <p
-              style={{
-                color: '#6B7280',
-                maxWidth: 480,
-                margin: '0 auto',
-                lineHeight: 1.65,
-                fontSize: '0.9rem',
-              }}
-            >
-              AI interview practice, typing training, and job matching
-              — in one focused platform.
+            <p style={{ color: '#6B7280', maxWidth: 480, margin: '0 auto', lineHeight: 1.65, fontSize: '0.9rem' }}>
+              AI interview practice, typing training, and job matching — in one focused platform.
             </p>
           </div>
 
-          <div
-            style={{
-              display: 'flex',
-              gap: '1.25rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={staggerContainer}
+            style={{ display: 'flex', gap: '1.25rem', flexWrap: 'wrap', justifyContent: 'center' }}
           >
             <FeatureCard
               icon="🎤"
@@ -618,71 +547,36 @@ function LandingPage() {
               title="100% Free Stack"
               description="Gemini 2.0 Flash (1500 req/day), DuckDuckGo search, spaCy offline NLP. No credit card, no paid APIs, no limits that matter."
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── How it works ─────────────────────────────── */}
-      <section
-        id="how-it-works"
-        style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}
-      >
+      <section id="how-it-works" style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}>
         <div style={{ maxWidth: SECTION_MAX_WIDTH, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
             <SectionLabel>How it works</SectionLabel>
-            <SectionHeading>
-              From signup to offer-ready in days
-            </SectionHeading>
+            <SectionHeading>From signup to offer-ready in days</SectionHeading>
           </div>
-          <div
-            style={{
-              display: 'flex',
-              gap: '1rem',
-              flexWrap: 'wrap',
-              justifyContent: 'center',
-            }}
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.2 }}
+            variants={staggerContainer}
+            style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}
           >
-            <StepCard
-              number="01"
-              title="Create your account"
-              description="Sign up free — no credit card needed."
-            />
-            <StepCard
-              number="02"
-              title="Upload your resume"
-              description="AI parses your skills and experience automatically."
-            />
-            <StepCard
-              number="03"
-              title="Browse matching jobs"
-              description="Get ranked recommendations based on your profile."
-            />
-            <StepCard
-              number="04"
-              title="Practice interviews"
-              description="Speak your answers, get AI scores and feedback."
-            />
-            <StepCard
-              number="05"
-              title="Track your progress"
-              description="Watch scores improve in your analytics dashboard."
-            />
-          </div>
+            <StepCard number="01" title="Create your account" description="Sign up free — no credit card needed." />
+            <StepCard number="02" title="Upload your resume" description="AI parses your skills and experience automatically." />
+            <StepCard number="03" title="Browse matching jobs" description="Get ranked recommendations based on your profile." />
+            <StepCard number="04" title="Practice interviews" description="Speak your answers, get AI scores and feedback." />
+            <StepCard number="05" title="Track your progress" description="Watch scores improve in your analytics dashboard." />
+          </motion.div>
         </div>
       </section>
 
       {/* ── Pricing ──────────────────────────────────── */}
-      <section
-        id="pricing"
-        style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}
-      >
-        <div
-          style={{
-            maxWidth: 560,
-            margin: '0 auto',
-            textAlign: 'center',
-          }}
-        >
+      <section id="pricing" style={{ padding: SECTION_PADDING, scrollMarginTop: 60 }}>
+        <div style={{ maxWidth: 560, margin: '0 auto', textAlign: 'center' }}>
           <SectionLabel>Pricing</SectionLabel>
           <SectionHeading>
             Simple pricing — always{' '}
@@ -697,19 +591,16 @@ function LandingPage() {
               free
             </span>
           </SectionHeading>
-          <p
-            style={{
-              color: '#6B7280',
-              lineHeight: 1.65,
-              marginBottom: '2.5rem',
-              fontSize: '0.9rem',
-            }}
-          >
-            CareerBoost is built on a 100% free AI stack. No subscriptions,
-            no credits, no paywalls.
+          <p style={{ color: '#6B7280', lineHeight: 1.65, marginBottom: '2.5rem', fontSize: '0.9rem' }}>
+            CareerBoost is built on a 100% free AI stack. No subscriptions, no credits, no paywalls.
           </p>
 
-          <div
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.3 }}
+            variants={fadeInUp}
+            transition={transitionDefault}
             style={{
               padding: '2.5rem 2rem',
               background: 'rgba(17, 24, 39, 0.6)',
@@ -734,25 +625,11 @@ function LandingPage() {
             >
               $0
             </div>
-            <p
-              style={{
-                color: '#9CA3AF',
-                marginBottom: '2rem',
-                fontSize: '0.875rem',
-              }}
-            >
+            <p style={{ color: '#9CA3AF', marginBottom: '2rem', fontSize: '0.875rem' }}>
               Forever free · No credit card required
             </p>
 
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.625rem',
-                marginBottom: '2rem',
-                textAlign: 'left',
-              }}
-            >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.625rem', marginBottom: '2rem', textAlign: 'left' }}>
               {[
                 'Unlimited AI mock interviews',
                 'AI-generated adaptive questions',
@@ -763,25 +640,8 @@ function LandingPage() {
                 'Analytics dashboard & progress tracking',
                 'DuckDuckGo-powered web search context',
               ].map((f) => (
-                <div
-                  key={f}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    fontSize: '0.875rem',
-                    color: '#D1D5DB',
-                  }}
-                >
-                  <span
-                    style={{
-                      color: '#2DD4BF',
-                      fontWeight: 700,
-                      flexShrink: 0,
-                    }}
-                  >
-                    ✓
-                  </span>
+                <div key={f} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.875rem', color: '#D1D5DB' }}>
+                  <span style={{ color: '#2DD4BF', fontWeight: 700, flexShrink: 0 }}>✓</span>
                   {f}
                 </div>
               ))}
@@ -801,27 +661,26 @@ function LandingPage() {
                 textAlign: 'center',
                 transition: 'opacity 200ms ease',
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.opacity = '0.85')
-              }
+              onMouseEnter={(e) => (e.currentTarget.style.opacity = '0.85')}
               onMouseLeave={(e) => (e.currentTarget.style.opacity = '1')}
             >
               Get started free →
             </Link>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ── Final CTA ────────────────────────────────── */}
-      <section
-        style={{
-          padding: SECTION_PADDING,
-          textAlign: 'center',
-          position: 'relative',
-        }}
-      >
+      <section style={{ padding: SECTION_PADDING, textAlign: 'center', position: 'relative' }}>
         <CrossGridBackground opacity={0.06} />
-        <div style={{ position: 'relative', zIndex: 10 }}>
+        <motion.div
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.4 }}
+          variants={fadeInUp}
+          transition={transitionDefault}
+          style={{ position: 'relative', zIndex: 10 }}
+        >
           <h2
             style={{
               fontSize: 'clamp(1.75rem, 4vw, 3rem)',
@@ -843,13 +702,7 @@ function LandingPage() {
               dream role?
             </span>
           </h2>
-          <p
-            style={{
-              color: '#9CA3AF',
-              marginBottom: '2.25rem',
-              fontSize: '1rem',
-            }}
-          >
+          <p style={{ color: '#9CA3AF', marginBottom: '2.25rem', fontSize: '1rem' }}>
             Join CareerBoost today — completely free, forever.
           </p>
           <Link
@@ -868,37 +721,21 @@ function LandingPage() {
             }}
             onMouseEnter={(e) => {
               e.currentTarget.style.transform = 'translateY(-3px)';
-              e.currentTarget.style.boxShadow =
-                '0 0 44px rgba(45,212,191,0.55)';
+              e.currentTarget.style.boxShadow = '0 0 44px rgba(45,212,191,0.55)';
             }}
             onMouseLeave={(e) => {
               e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow =
-                '0 0 28px rgba(45,212,191,0.38)';
+              e.currentTarget.style.boxShadow = '0 0 28px rgba(45,212,191,0.38)';
             }}
           >
             Get started free →
           </Link>
-        </div>
+        </motion.div>
       </section>
 
       {/* ── Footer ───────────────────────────────────── */}
-      <footer
-        style={{
-          padding: '1.75rem 2rem',
-          textAlign: 'center',
-          borderTop: '1px solid rgba(255,255,255,0.05)',
-        }}
-      >
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.5rem',
-            marginBottom: '0.5rem',
-          }}
-        >
+      <footer style={{ padding: '1.75rem 2rem', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <div
             style={{
               width: 18,
@@ -907,9 +744,7 @@ function LandingPage() {
               background: 'linear-gradient(135deg, #2DD4BF, #06B6D4)',
             }}
           />
-          <span style={{ fontWeight: 600, color: '#6B7280', fontSize: '0.875rem' }}>
-            CareerBoost
-          </span>
+          <span style={{ fontWeight: 600, color: '#6B7280', fontSize: '0.875rem' }}>CareerBoost</span>
         </div>
         <p style={{ color: '#4B5563', fontSize: '0.8rem' }}>
           © 2026 CareerBoost. Built with FastAPI + React + Gemini AI.

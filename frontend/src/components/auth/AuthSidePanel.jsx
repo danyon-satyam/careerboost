@@ -1,4 +1,7 @@
 import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
+import { fadeIn } from '../../animations/variants.js';
+import { transitionBounce, transitionSlow } from '../../animations/transitions.js';
 
 const FEATURES = [
   { icon: '🎤', text: 'Practice with a real AI interviewer' },
@@ -116,8 +119,17 @@ function AuthSidePanel() {
       </div>
 
       {/* Center content */}
-      <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: 380 }}>
-        <div
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={fadeIn}
+        transition={transitionSlow}
+        style={{ position: 'relative', zIndex: 10, textAlign: 'center', maxWidth: 380 }}
+      >
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={transitionBounce}
           style={{
             width: 72,
             height: 72,
@@ -135,7 +147,7 @@ function AuthSidePanel() {
           }}
         >
           CB
-        </div>
+        </motion.div>
 
         <h2
           style={{
@@ -189,7 +201,7 @@ function AuthSidePanel() {
             );
           })}
         </div>
-      </div>
+      </motion.div>
 
       <style>{`
         @keyframes floatOrb {
