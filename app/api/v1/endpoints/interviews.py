@@ -10,8 +10,12 @@ from app.schemas.interview import (
     InterviewSummary,
     AnswerSubmit,
     AnswerResponse,
-    InterviewResultResponse
+    InterviewResultResponse,
+    JDParseRequest,
+    JDParseResponse,
 )
+from app.services.jd_parser_service import jd_parser_service
+from app.services.user_service import user_service as _user_service
 from app.services.interview_service import interview_service
 from app.services.conversation_service import conversation_service
 
@@ -61,6 +65,35 @@ def list_interviews(
     return interview_service.get_user_interviews(
         db=db,
         user_id=current_user_id
+    )
+
+
+@router.post(
+    "/parse-jd",
+    response_model=JDParseResponse,
+    summary="Parse JD text and start an interview"
+)
+def parse_jd_and_start(
+    payload: JDParseRequest,
+    current_user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db)
+):
+    """
+    Accept raw job description text, extract skills and role,
+    create a Job record, and immediately start an interview.
+
+    Returns the full interview plan including extracted skills,
+    question sections, and sample questions.
+
+    Use this when the user doesn't have an existing job_id.
+    """
+    user = _user_service.get_by_id(db, current_user_id)
+    return jd_parser_service.parse_and_start(
+        db=db,
+        user=user,
+        jd_text=payload.jd_text,
+        title_override=payload.title,
+        company_override=payload.company,
     )
 
 
