@@ -79,3 +79,31 @@ class InterviewResultResponse(BaseModel):
     answered_questions: int
 
     model_config = {"from_attributes": True}
+
+
+class JDParseRequest(BaseModel):
+    jd_text: str
+    title: Optional[str] = None
+    company: Optional[str] = None
+
+    @field_validator("jd_text")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
+        if len(v.strip()) < 50:
+            raise ValueError(
+                "Job description must be at least 50 characters"
+            )
+        return v.strip()
+
+
+class JDParseResponse(BaseModel):
+    interview_id: int
+    job_id: int
+    title: str
+    company: str
+    extracted_skills: List[str]
+    required_experience: int
+    questions: List[QuestionResponse]
+    total_questions: int
+    sections: List[str]
+    status: str
