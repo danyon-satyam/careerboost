@@ -180,7 +180,7 @@ def get_results(
     """
     Get the full results of a completed interview.
 
-    Returns: 
+    Returns:
     - Overall score (0-100)
     - Technical and communication scores
     - Detailed feedback text
