@@ -4,6 +4,7 @@ import interviewReducer from './slices/interviewSlice';
 import jobReducer from './slices/jobSlice';
 import typingReducer from './slices/typingSlice';
 import uiReducer from './slices/uiSlice';
+import candidateReducer from './slices/candidateSlice.js';
 
 export const store = configureStore({
   reducer: {
@@ -12,6 +13,7 @@ export const store = configureStore({
     jobs: jobReducer,
     typing: typingReducer,
     ui: uiReducer,
+    candidate: candidateReducer,
   },
 });
 
